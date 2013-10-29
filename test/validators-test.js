@@ -2,7 +2,7 @@
 var buster = require("buster-node");
 var assert = buster.assert;
 var refute = buster.refute;
-var args = require("./../lib/posix-argv-parser");
+var args = require("./../lib/samplx-argv-parser");
 var path = require("path");
 var net = require("net");
 var fs = require("fs");
@@ -285,7 +285,7 @@ buster.testCase("validators", {
                 }));
             },
 
-            "test on none existing file/directory": function (done) {
+            "test on non-existing file/directory": function (done) {
                 this.stubFsStat({ isFile: false, isDirectory: false });
                 this.a.parse(["/dev/null"], done(function (errors) {
                     assert.equals(errors.length, 1);
@@ -322,7 +322,7 @@ buster.testCase("validators", {
                 }));
             },
 
-            "test on none existing file/directory": function (done) {
+            "test on non-existing file/directory": function (done) {
                 this.stubFsStat({ isFile: false, isDirectory: false });
                 this.a.parse(["/dev/null"], done(function (errors) {
                     assert.equals(errors.length, 1);
@@ -386,35 +386,35 @@ buster.testCase("validators", {
 
     "maxTimesSet": {
         "passes if not set": function (done) {
-            this.a.createOption(["-v"], { validators: [v.maxTimesSet(2)] });
+            this.a.createOption(["-v"], { allowMultiple: true, validators: [v.maxTimesSet(2)] });
             this.a.parse([], done(function (errors, options) {
                 refute(errors);
             }));
         },
 
         "passes if set few enough times": function (done) {
-            this.a.createOption(["-v"], { validators: [v.maxTimesSet(2)] });
+            this.a.createOption(["-v"], { allowMultiple: true, validators: [v.maxTimesSet(2)] });
             this.a.parse(["-v"], done(function (errors, options) {
                 refute(errors);
             }));
         },
 
         "passes if set max times": function (done) {
-            this.a.createOption(["-v"], { validators: [v.maxTimesSet(2)] });
+            this.a.createOption(["-v"], { allowMultiple: true, validators: [v.maxTimesSet(2)] });
             this.a.parse(["-v", "-v"], done(function (errors, options) {
                 refute(errors);
             }));
         },
 
         "fails if passed too many times": function (done) {
-            this.a.createOption(["-v"], { validators: [v.maxTimesSet(2)] });
+            this.a.createOption(["-v"], { allowMultiple: true, validators: [v.maxTimesSet(2)] });
             this.a.parse(["-v", "-v", "-v"], done(function (errors, options) {
                 assert(errors);
             }));
         },
 
         "fails with understandable error": function (done) {
-            this.a.createOption(["-v"], { validators: [v.maxTimesSet(2)] });
+            this.a.createOption(["-v"], { allowMultiple: true, validators: [v.maxTimesSet(2)] });
             this.a.parse(["-v", "-v", "-v"], done(function (errors, options) {
                 assert.match(errors[0], "-v: can only be set 2 times");
             }));
@@ -422,6 +422,7 @@ buster.testCase("validators", {
 
         "fails with custom error": function (done) {
             this.a.createOption(["-v"], {
+                allowMultiple: true, 
                 validators: [v.maxTimesSet(2, "${1} iz ${2}!")]
             });
             this.a.parse(["-v", "-v", "-v"], done(function (errors, options) {
@@ -430,6 +431,106 @@ buster.testCase("validators", {
         }
     },
 
+    "positiveInteger": {
+        "test Infinity value": function (done) {
+            this.a.createOption(["-v"], { hasValue: true, validators: [v.positiveInteger()] });
+            
+            this.a.parse(["-v", "Infinity"], done(function (errors, options) {
+                assert.equals(options["-v"].value, "Infinity");
+            }));
+        },
+        
+        "test negative integer": function (done) {
+            this.a.createOption(["-v"], { hasValue: true, validators: [v.positiveInteger()] });
+            
+            this.a.parse(["-v=-12"], done(function (errors, options) {
+                assert.match(errors[0], /is not a positive integer/);
+            }));
+        },
+        
+        "test positive integer": function (done) {
+            this.a.createOption(["-v"], { hasValue: true, validators: [v.positiveInteger()] });
+            
+            this.a.parse(["-v", "12"], done(function (errors, options) {
+                assert.equals(options["-v"].value, "12");
+            }));
+        },
+        
+        "test floating number": function (done) {
+            this.a.createOption(["-v"], { hasValue: true, validators: [v.positiveInteger()] });
+            
+            this.a.parse(["-v", "3.14"], done(function (errors, options) {
+                assert.match(errors[0], /is not a positive integer/);
+            }));
+        },
+
+        "test non-number": function (done) {
+            this.a.createOption(["-v"], { hasValue: true, validators: [v.positiveInteger()] });
+            
+            this.a.parse(["-v", "twelve"], done(function (errors, options) {
+                assert.match(errors[0], /is not a positive integer/);
+            }));
+        },
+    },
+    
+    "isURL": {
+        "http URL" : function (done) {
+            this.a.createOption(["--url"], { hasValue: true, validators: [v.isURL()] });
+            
+            this.a.parse(["--url", "http://example.com"], done(function (errors, options) {
+                assert.equals(options["--url"].value, "http://example.com");
+            }));
+        },
+        
+        "scheme authority path URL" : function(done) {
+            this.a.createOption(["--url"], { hasValue: true, validators: [v.isURL()] });
+            
+            this.a.parse(["--url", "http://example.com/myfile"], done(function (errors, options) {
+                assert.equals(options["--url"].value, "http://example.com/myfile");
+            }));
+        },
+        
+        "scheme authority path query URL" : function (done) {
+            this.a.createOption(["--url"], { hasValue: true, validators: [v.isURL()] });
+            
+            this.a.parse(["--url", "http://example.com/index.php?what=now"], done(function (errors, options) {
+                assert.equals(options["--url"].value, "http://example.com/index.php?what=now");
+            }));
+        },
+        
+        "scheme authority path query fragment URL" : function (done) {
+            this.a.createOption(["--url"], { hasValue: true, validators: [v.isURL()] });
+            
+            this.a.parse(["--url", "http://example.com/index.php?what=now#there"], done(function (errors, options) {
+                assert.equals(options["--url"].value, "http://example.com/index.php?what=now#there");
+            }));
+        },
+        
+        "scheme authority no-path query URL" : function (done) {
+            this.a.createOption(["--url"], { hasValue: true, validators: [v.isURL()] });
+            
+            this.a.parse(["--url", "http://example.com/?what=now"], done(function (errors, options) {
+                assert.equals(options["--url"].value, "http://example.com/?what=now");
+            }));
+        },
+        
+        "scheme authority no-path no-query fragement URL": function (done) {
+            this.a.createOption(["--url"], { hasValue: true, validators: [v.isURL()] });
+            
+            this.a.parse(["--url", "http://example.com#there"], done(function (errors, options) {
+                assert.equals(options["--url"].value, "http://example.com#there");
+            }));
+        },
+        
+        "no scheme invalid URL": function (done) {
+            this.a.createOption(["--url"], { hasValue: true, validators: [v.isURL()] });
+            
+            this.a.parse(["--url", "example.com"], done(function (errors, options) {
+                assert.equals(options["--url"].value, "example.com");
+            }));
+        },
+    },
+    
     "custom error messages": {
         "test integer": function (done) {
             this.validatedOption(v.integer("I love ${2}!"));

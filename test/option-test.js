@@ -2,7 +2,7 @@
 var buster = require("buster-node");
 var assert = buster.assert;
 var refute = buster.refute;
-var args = require("./../lib/posix-argv-parser");
+var args = require("./../lib/samplx-argv-parser");
 var when = require("when");
 
 buster.testCase("Short options", {
@@ -41,7 +41,7 @@ buster.testCase("Short options", {
     },
 
     "test one option twice as separate options": function (done) {
-        this.a.createOption(["-p"]);
+        this.a.createOption(["-p"], { allowMultiple: true });
         this.a.parse(["-p", "-p"], done(function (errors, options) {
             assert(options["-p"].isSet);
             assert.equals(options["-p"].timesSet, 2);
@@ -49,7 +49,7 @@ buster.testCase("Short options", {
     },
 
     "test one option thrice as separate options": function (done) {
-        this.a.createOption(["-p"]);
+        this.a.createOption(["-p"], { allowMultiple: true });
         this.a.parse(["-p", "-p", "-p"], done(function (errors, options) {
             assert(options["-p"].isSet);
             assert.equals(options["-p"].timesSet, 3);
@@ -57,7 +57,7 @@ buster.testCase("Short options", {
     },
 
     "test one option twice as one grouped option": function (done) {
-        this.a.createOption(["-p"]);
+        this.a.createOption(["-p"], { allowMultiple: true });
         this.a.parse(["-pp"], done(function (errors, options) {
             assert(options["-p"].isSet);
             assert.equals(options["-p"].timesSet, 2);
@@ -65,7 +65,7 @@ buster.testCase("Short options", {
     },
 
     "test one option thrice as one grouped option": function (done) {
-        this.a.createOption(["-p"]);
+        this.a.createOption(["-p"], { allowMultiple: true });
         this.a.parse(["-ppp"], done(function (errors, options) {
             assert(options["-p"].isSet);
             assert.equals(options["-p"].timesSet, 3);
@@ -73,7 +73,7 @@ buster.testCase("Short options", {
     },
 
     "test one option thrice as bith grouped and separate": function (done) {
-        this.a.createOption(["-p"]);
+        this.a.createOption(["-p"], { allowMultiple: true });
         this.a.parse(["-pp", "-p"], done(function (errors, options) {
             assert(options["-p"].isSet);
             assert.equals(options["-p"].timesSet, 3);
@@ -81,8 +81,8 @@ buster.testCase("Short options", {
     },
 
     "test two options as separate args": function (done) {
-        this.a.createOption(["-p"]);
-        this.a.createOption(["-z"]);
+        this.a.createOption(["-p"], { allowMultiple: true });
+        this.a.createOption(["-z"], { allowMultiple: true });
 
         this.a.parse(["-p", "-z"], done(function (errors, options) {
             assert(options["-p"].isSet);
@@ -93,8 +93,8 @@ buster.testCase("Short options", {
     },
 
     "test two options as one arg": function (done) {
-        this.a.createOption(["-p"]);
-        this.a.createOption(["-z"]);
+        this.a.createOption(["-p"], { allowMultiple: true });
+        this.a.createOption(["-z"], { allowMultiple: true });
 
         this.a.parse(["-pz"], done(function (errors, options) {
             assert(options["-p"].isSet);
@@ -105,8 +105,8 @@ buster.testCase("Short options", {
     },
 
     "test two options two times grouped with self": function (done) {
-        this.a.createOption(["-p"]);
-        this.a.createOption(["-z"]);
+        this.a.createOption(["-p"], { allowMultiple: true });
+        this.a.createOption(["-z"], { allowMultiple: true });
 
         this.a.parse(["-pp", "-zz"], done(function (errors, options) {
             assert(options["-p"].isSet);
@@ -117,8 +117,8 @@ buster.testCase("Short options", {
     },
 
     "test two options two times grouped with other": function (done) {
-        this.a.createOption(["-p"]);
-        this.a.createOption(["-z"]);
+        this.a.createOption(["-p"], { allowMultiple: true });
+        this.a.createOption(["-z"], { allowMultiple: true });
 
         this.a.parse(["-pz", "-zp"], done(function (errors, options) {
             assert(options["-p"].isSet);
@@ -129,8 +129,8 @@ buster.testCase("Short options", {
     },
 
     "test two options where only one occurs": function (done) {
-        this.a.createOption(["-p"]);
-        this.a.createOption(["-z"]);
+        this.a.createOption(["-p"], { allowMultiple: true });
+        this.a.createOption(["-z"], { allowMultiple: true });
 
         this.a.parse(["-p"], done(function (errors, options) {
             assert(options["-p"].isSet);
@@ -140,8 +140,8 @@ buster.testCase("Short options", {
     },
 
     "test two options each occurring thrice": function (done) {
-        this.a.createOption(["-p"]);
-        this.a.createOption(["-z"]);
+        this.a.createOption(["-p"], { allowMultiple: true });
+        this.a.createOption(["-z"], { allowMultiple: true });
 
         this.a.parse(["-pzz", "-ppz"], done(function (errors, options) {
             assert(options["-p"].isSet);
@@ -304,7 +304,36 @@ buster.testCase("Short options", {
         this.a.parse(["--", "-p"], done(function (errors, options) {
             assert.defined(errors);
         }));
-    }
+    },
+
+    "test option set twice but not allowMultiple": function (done) {
+        this.a.createOption(["-p"]);
+
+        this.a.parse(["-p", "-p"], done(function (errors, options) {
+            assert(errors);
+            assert.match(errors[0], /value already set for/i);
+            assert.match(errors[0], "-p");
+        }));
+    },
+
+    "test option with argument set multiple times": function (done) {
+        this.a.createOption(["-p"], { allowMultiple: true, hasValue: true });
+        
+        this.a.parse(["-p12", "-p34"], done(function (errors, options) {
+            assert.equals(options["-p"].value.length, 2);
+            assert.equals(options["-p"].value[0], "12");
+            assert.equals(options["-p"].value[1], "34");
+        }));
+    },
+    
+    "test options with allowOverride set multiple times": function (done) {
+        this.a.createOption(["-p"], { allowOverride: true, hasValue: true });
+        
+        this.a.parse(["-p12", "-p34"], done(function (errors, options) {
+            assert.equals(options["-p"].value, "34");
+        }));
+    },
+    
 });
 
 buster.testCase("Long options", {
@@ -338,7 +367,7 @@ buster.testCase("Long options", {
     },
 
     "test one option twice as separate options": function (done) {
-        this.a.createOption(["--port"]);
+        this.a.createOption(["--port"], { allowMultiple: true });
         this.a.parse(["--port", "--port"], done(function (errors, options) {
             assert(options["--port"].isSet);
             assert.equals(options["--port"].timesSet, 2);
@@ -346,7 +375,7 @@ buster.testCase("Long options", {
     },
 
     "test one option thrice as separate options": function (done) {
-        this.a.createOption(["--port"]);
+        this.a.createOption(["--port"], { allowMultiple: true });
         this.a.parse(["--port", "--port", "--port"], done(function (errors, options) {
             assert(options["--port"].isSet);
             assert.equals(options["--port"].timesSet, 3);

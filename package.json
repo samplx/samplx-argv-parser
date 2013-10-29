@@ -1,35 +1,54 @@
 {
-    "name": "posix-argv-parser",
-    "version": "1.0.0",
-    "description": "POSIX compliant command-line argument parser.",
-    "homepage": "http://busterjs.org/docs/posix-argv-parser",
-    "author": { "name": "August Lilleaas" },
-    "contributors": [{
-        "name": "Christian Johansen",
-        "email": "christian@cjohansen.no",
-        "url": "http://cjohansen.no"
-    }, {
-        "name": "August Lilleaas",
-        "email": "august.lilleaas@gmail.com",
-        "url": "http://augustl.com"
-    }, {
-        "name": "Stein Magnus Jodal",
-        "email": "stein.magnus@jodal.no",
-        "url": "http://jodal.no"
-    }],
-    "main": "./lib/posix-argv-parser",
-    "repository": "https://github.com/busterjs/posix-argv-parser.git",
-    "license": {
-        "type": "BSD",
-        "url": "https://github.com/busterjs/posix-argv-parser/blob/master/LICENSE"
+  "name": "samplx-argv-parser",
+  "version": "1.0.0",
+  "description": "command-line argument parser (fork of busterjs/posix-argv-parser).",
+  "homepage": "http://samplx.org/samplx-argv-parser",
+  "author": {
+    "name": "August Lilleaas"
+  },
+  "contributors": [
+    {
+      "name": "Christian Johansen",
+      "email": "christian@cjohansen.no",
+      "url": "http://cjohansen.no"
     },
-    "scripts": {
-        "test": "node run-tests.js"
+    {
+      "name": "August Lilleaas",
+      "email": "august.lilleaas@gmail.com",
+      "url": "http://augustl.com"
     },
-    "dependencies": {
-        "when": "https://github.com/cujojs/when/tarball/1.8.1"
+    {
+      "name": "Stein Magnus Jodal",
+      "email": "stein.magnus@jodal.no",
+      "url": "http://jodal.no"
     },
-    "devDependencies": {
-        "buster-node": "0.1"
+    {
+      "name": "Jim Burlingame",
+      "email": "jb@samplx.org"
     }
+  ],
+  "main": "./lib/samplx-argv-parser",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/samplx/samplx-argv-parser.git"
+  },
+  "license": {
+    "type": "BSD",
+    "url": "https://github.com/samplx/samplx-argv-parser/blob/master/LICENSE"
+  },
+  "scripts": {
+    "test": "node run-tests.js"
+  },
+  "dependencies": {
+    "when": "~ 1.8.1"
+  },
+  "devDependencies": {
+    "buster-node": "0.1"
+  },
+  "readmeFilename": "Readme.md",
+  "bugs": {
+    "url": "https://github.com/samplx/samplx-argv-parser/issues"
+  },
+  "_id": "samplx-argv-parser@1.0.0",
+  "_from": "posix-argv-parser@1.0.0"
 }

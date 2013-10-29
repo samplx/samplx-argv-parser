@@ -1,22 +1,27 @@
-# posix-argv-parser
+# samplx-argv-parser
 
-[![Build status](https://secure.travis-ci.org/busterjs/posix-argv-parser.png?branch=master)](http://travis-ci.org/busterjs/posix-argv-parser)
-
-The Node.JS argument parser that helps you be a good Unix citizen and
-doesn't make an ass out of u and me.
-
-`posix-argv-parser` is a command line interface (CLI) argument parser that is:
+`samplx-argv-parser` is a command line interface (CLI) argument parser that is:
 
 * [POSIX "Utility Argument Syntax"](http://pubs.opengroup.org/onlinepubs/9699919799/) compliant
-* **Unobtrusive** - Does not mandate flow control, does not print to STDOUT on
-  your behalf, and does not magically manage `--help`
 * **Ambiguity aware** - lets you specify how to handle ambiguities such as
   `-bar`, which can mean both `-b -a -r` and `-b=ar`.
+* Supports standardized Usage, Version, and Help messages.
 
 ```js
-var pap = require("posix-argv-parser");
-var args = pap.create();
-var v = pap.validators;
+var argvParser = require("samplx-argv-parser");
+var parserOptions = {
+    // program name -- defaults to process.title
+    prog : 'sample-program',
+    
+    // string used to describe the program in help message.
+    description : 'A sample program',
+    
+    // string printed after the help message.
+    epilog : 'See more at http://samplx.org/sample-program/'
+    
+};
+
+var args = argvParser.create(parserOptions);
 
 args.createOption(["-p", "--port"], {
     // All options are optional
@@ -26,11 +31,17 @@ args.createOption(["-p", "--port"], {
 
     // Both built-in and custom validations supported,
     // synchronous as well as asynchronous (promise based)
-    validators: [v.integer("Custom message. ${1} must be a number.")],
+    validators: [argvParser.integer("Custom message. ${1} must be a number.")],
 
     // Transforms allow you to get more intelligent values
     // than raw strings back
-    transform: function (value) { return parseInt(value, 10); }
+    transform: function (value) { return parseInt(value, 10); },
+    
+    // how this option is described in a help message.
+    description: 'define my port number.',
+    
+    // how this option's parameter is described in the help message.
+    valueName: 'PORT'
 });
 
 args.createOption(["-v"], {
@@ -51,8 +62,10 @@ args.createOperand("rootPath", {
     validators: [v.file(), v.required()]
 });
 
-posixArgvParser.parse(process.argv.slice(2), function (errors, options) {
-    if (errors) { return console.log(errors[0]); }
+args.parse(process.argv.slice(2), function (errors, options) {
+    if (errors) { 
+        args.printUsage(errors);
+    }
 
     // Various useful ways to get the values from the options.
     options["-v"].timesSet;
@@ -65,13 +78,13 @@ posixArgvParser.parse(process.argv.slice(2), function (errors, options) {
 
 ## Methods
 
-### `posixArgvParser.create()`
+### `argvParser.create()`
 
 ```js
-var args = require("posix-argv-parser").create();
+var args = require("samplx-argv-parser").create(parserOptions);
 ```
 
-Creates a new instance of posix-argv-parser that holds a collection of
+Creates a new instance of samplx-argv-parser that holds a collection of
 options and operands.
 
 ### `args.createOption(flags[, options])`
@@ -122,10 +135,11 @@ undefined, or an array of errors and/or validation messages, and an
 `options` object, which is used to retrieve data from configured options.
 
 ```js
-var args = require("posix-argv-parser").create();
+var args = require("samplx-argv-parser").create();
 args.handle(process.argv.slice(2), function (errors, options) {
     if (errors) {
         // Print an error msg, i.e. console.log(errors[0])
+        // may also generate a standard usage message
         return;
     }
     // Continue with normal operation. I.e. options["-v"].hasValue,
@@ -133,23 +147,52 @@ args.handle(process.argv.slice(2), function (errors, options) {
 });
 ```
 
+### `args.printVersion(version [, verbose])`
+
+Prints a standard program version string. If `verbose` is `true` the Node.js version information is also printed.
+
+```js
+var args = require("samplx-argv-parser").create();
+args.printVersion('1.0.0', true);
+```
+
+### `args.printUsage(errors [, verbose])`
+
+Prints a standard usage message to stderr. The first argument `errors` is either undefined, or an
+array of errors and/or validation messages. The option second argument is `true` if the usage
+message should include the standard help message as well.
+
+```js
+var args = require("samplx-argv-parser").create(parserOptions);
+// create options, shorthands and operands.
+args.parse(process.argv.slice(2), function (errors, options) {
+    if (errors) {
+        args.printUsage(errors, true);
+        process.exit(2);
+    }
+    // handle normal options.
+
+}
+```
+
+
 ## Arguments (options and operands)
 
 Options (`args.createOption` and operands (`args.createOperand`) are
-the two types of arguments handled by posix-argv-parser, and they
+the two types of arguments handled by samplx-argv-parser, and they
 share common functionality, listed below this introduction.
 
 An **option** is a flag, with or without a value. `-p`, `-p abc`,
 `-pabc`, `-p=abc`, `--port abc` and `--port=abc` are all supported by
-posix-argv-parser.
+samplx-argv-parser.
 
-`-pabc` can mean both `-p -a -b -c` and `-p=abc`. posix-argv-parser
+`-pabc` can mean both `-p -a -b -c` and `-p=abc`. samplx-argv-parser
 uses `opt.hasValue` to separate the two. With `opt.hasValue` set to
 true, `-pabc` will be handled as `-p=abc`. When false (default), it
 will be handled as `-p -a -b -c`. In that case you also need to have
 option handlers for `-a`, `-b` and `-c`, or you'll get a validation
 error such as `"unknown option -a"` (depending on which option
-posix-argv-parser first encountered that didn't exist).
+samplx-argv-parser first encountered that didn't exist).
 
 An **operand** is an option-less value, i.e. `foo` (with no `-b` or
 `--myopt` prefixing it). It's commonly used for arguments that always
@@ -207,7 +250,7 @@ to it::
 
 ```js
 var opt = args.createOption(["-v", "--version"]);
-opt.signature; // "-v/--version"
+opt.signature; // "-v|--version"
 opt.signature = "-v"; // custom signature
 ```
 
@@ -220,6 +263,14 @@ var rootDir = args.createOperand();
 rootDir.signature; // "OPD", as the default name
 rootDir.signature = "Root directory";
 ```
+
+### `opt.valueName`
+
+Used to define the value name for the help message. Defaults to 'VALUE'.
+
+### `opt.description`
+
+Used to define a description of the argument for the help message.
 
 ## Options
 
@@ -236,6 +287,21 @@ options, that may be provided alone to get general help, e.g. `mything
 --help`, and with values to get help for specific topics, e.g.
 `mything --help bisect`.
 
+### `opt.groupName`
+
+Generates a sub-title in help message. Only define this on the first option
+in the option group.
+
+### `opt.allowOverride`
+
+When `true`, allows an option which defines a value to override an earlier option.
+
+### `opt.allowMultiple`
+
+When `true`, allows multiple options. If option defines a value, an `Array` of the
+values is used to keep all of the values defined.
+
+
 ## Argument result
 
 Argument result objects are produced when calling `args.parse` to
@@ -251,7 +317,8 @@ in `argv`.
 ### `argumentResult.value`
 
 The value of the argument. Is normally a string, but may be any object
-if the argument had a transform function.
+if the argument had a transform function. If `opt.allowMultiple` is defined,
+then the value is an `Array` of argument values.
 
 ### `argumentResult.timesSet`
 
@@ -271,7 +338,7 @@ user more and more verbose output from your program:
 Validators let you add requirements with associated error messages to
 options and operands.
 
-posix-argv-parser has a number of built-in validators, and creating
+samplx-argv-parser has a number of built-in validators, and creating
 custom ones is dead simple, as a validator is just a function.
 
 ### Built-in validators
@@ -287,10 +354,10 @@ the built-in validators all return the actual validation function.
 
 ```js
 // Uses built-in error message
-posixArgvParser.validators.required();
+argvParser.validators.required();
 
 // Specify your own error message
-posixArgvParser.validators.required("${1} has to be set");
+argvParser.validators.required("${1} has to be set");
 ```
 
 ### `validators.required(errorMessage)`
@@ -351,6 +418,27 @@ Custom error message:
 
 `${1}`: The specified file or directory
 `${2}`: The option `opt.signature`
+
+### `validators.positiveInteger(errorMessage)`
+
+Will fail validation if the option is not a positive integer or the value
+`Infinity`.
+
+### `validators.inEnum(values, errorMessage)`
+
+Will fail validation if the value provided is not included in the `Array` of values.
+
+### `validators.maxTimesSet(times, errorMessage)`
+
+Will fail if the option has been defined more than the number of `times`.
+
+### `validators.isURL(errorMessage)`
+
+Will fail if the option is not a valid URL.
+
+### `validators.isURLOrFile(errorMessage)`
+
+Will fail if the option is not a valid URL or an existing file name.
 
 ## Custom validators
 
@@ -436,39 +524,4 @@ args.createOption(["-n"], args.types.number({
 }));
 ```
 
-## Providing `--help`
 
-It's not in the nature of posix-argv-parser to automatically handle
-`--help` for you. It is however very easy to add such an option to
-your program. To help you keep all CLI option data in one place,
-options and operands are allowed to have a `opt.description`
-property that posix-argv-parser does not care about::
-
-```js
-var args = require("posix-argv-parser").create();
-
-args.createOption(["--port"], {
-    defaultValue: 1234
-    description: "The port to start the server on."
-});
-
-args.createOption(["-v"], {
-    description: "Level of detail in output. " +
-        "Pass multiple times (i.e. -vvv) for more output."
-});
-
-args.createOption(["--help", "-h"], { description: "Show this text" });
-help.helpText = "Show this text";
-
-args.parse(process.argv.slice(2), function (errors, options) {
-    if (errors) { return console.log(errors[0]); }
-
-    if (options["-h"].isSet) {
-        args.options.forEach(function (opt) {
-            console.log(opt.signature + ": " + opt.description);
-        });
-    } else {
-        // Proceed with normal program operation
-    }
-});
-```

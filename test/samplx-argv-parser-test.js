@@ -1,9 +1,9 @@
 var buster = require("buster-node");
 var assert = buster.assert;
 var refute = buster.refute;
-var args = require("./../lib/posix-argv-parser");
+var args = require("./../lib/samplx-argv-parser");
 
-buster.testCase("posix-argv-parser", {
+buster.testCase("samplx-argv-parser", {
     setUp: function () {
         this.a = args.create();
     },
