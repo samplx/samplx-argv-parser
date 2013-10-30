@@ -49,6 +49,6 @@
   "bugs": {
     "url": "https://github.com/samplx/samplx-argv-parser/issues"
   },
-  "_id": "samplx-argv-parser@1.0.0",
-  "_from": "posix-argv-parser@1.0.0"
+  "_id": "samplx-argv-parser@2.0.0",
+  "_from": "posix-argv-parser@2.0.0"
 }
