@@ -1,4 +1,4 @@
-var buster = require("buster-node");
+var buster = require("buster");
 require("./test/operand-test");
 require("./test/option-test");
 require("./test/parser-test");
