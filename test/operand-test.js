@@ -1,5 +1,5 @@
 /*jslint maxlen: 100*/
-var buster = require("buster-node");
+var buster = require("buster");
 var assert = buster.assert;
 var refute = buster.refute;
 var args = require("./../lib/samplx-argv-parser");
