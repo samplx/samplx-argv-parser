@@ -1,54 +1,52 @@
 {
-  "name": "samplx-argv-parser",
-  "version": "2.0.0",
-  "description": "command-line argument parser (fork of busterjs/posix-argv-parser).",
-  "homepage": "http://samplx.org/samplx-argv-parser",
-  "author": {
-    "name": "August Lilleaas"
-  },
-  "contributors": [
-    {
-      "name": "Christian Johansen",
-      "email": "christian@cjohansen.no",
-      "url": "http://cjohansen.no"
+    "name": "samplx-argv-parser",
+    "version": "2.0.1",
+    "description": "command-line argument parser (fork of busterjs/posix-argv-parser).",
+    "homepage": "http://samplx.org/samplx-argv-parser",
+    "author": {
+        "name": "August Lilleaas"
     },
-    {
-      "name": "August Lilleaas",
-      "email": "august.lilleaas@gmail.com",
-      "url": "http://augustl.com"
+    "contributors": [
+        {
+            "name": "Christian Johansen",
+            "email": "christian@cjohansen.no",
+            "url": "http://cjohansen.no"
+        },
+        {
+            "name": "August Lilleaas",
+            "email": "august.lilleaas@gmail.com",
+            "url": "http://augustl.com"
+        },
+        {
+            "name": "Stein Magnus Jodal",
+            "email": "stein.magnus@jodal.no",
+            "url": "http://jodal.no"
+        },
+        {
+            "name": "Jim Burlingame",
+            "email": "jb@samplx.org"
+        }
+    ],
+    "main": "./lib/samplx-argv-parser",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/samplx/samplx-argv-parser.git"
     },
-    {
-      "name": "Stein Magnus Jodal",
-      "email": "stein.magnus@jodal.no",
-      "url": "http://jodal.no"
+    "license": {
+        "type": "BSD",
+        "url": "https://github.com/samplx/samplx-argv-parser/blob/master/LICENSE"
     },
-    {
-      "name": "Jim Burlingame",
-      "email": "jb@samplx.org"
+    "scripts": {
+        "test": "node run-tests.js"
+    },
+    "dependencies": {
+        "when": "~ 1.8.1"
+    },
+    "devDependencies": {
+        "buster": "~ 0.7.7"
+    },
+    "readmeFilename": "Readme.md",
+    "bugs": {
+        "url": "https://github.com/samplx/samplx-argv-parser/issues"
     }
-  ],
-  "main": "./lib/samplx-argv-parser",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/samplx/samplx-argv-parser.git"
-  },
-  "license": {
-    "type": "BSD",
-    "url": "https://github.com/samplx/samplx-argv-parser/blob/master/LICENSE"
-  },
-  "scripts": {
-    "test": "node run-tests.js"
-  },
-  "dependencies": {
-    "when": "~ 1.8.1"
-  },
-  "devDependencies": {
-    "buster-node": "0.1"
-  },
-  "readmeFilename": "Readme.md",
-  "bugs": {
-    "url": "https://github.com/samplx/samplx-argv-parser/issues"
-  },
-  "_id": "samplx-argv-parser@2.0.0",
-  "_from": "posix-argv-parser@2.0.0"
 }
