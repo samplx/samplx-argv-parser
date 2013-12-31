@@ -1,6 +1,6 @@
 {
     "name": "samplx-argv-parser",
-    "version": "2.0.1",
+    "version": "2.0.2",
     "description": "command-line argument parser (fork of busterjs/posix-argv-parser).",
     "homepage": "http://samplx.org/samplx-argv-parser",
     "author": {
@@ -40,7 +40,7 @@
         "test": "node run-tests.js"
     },
     "dependencies": {
-        "when": "~ 1.8.1"
+        "when": "~ 2.5.1"
     },
     "devDependencies": {
         "buster": "~ 0.7.7"
