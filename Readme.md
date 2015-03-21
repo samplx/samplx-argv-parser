@@ -31,7 +31,7 @@ args.createOption(["-p", "--port"], {
 
     // Both built-in and custom validations supported,
     // synchronous as well as asynchronous (promise based)
-    validators: [argvParser.integer("Custom message. ${1} must be a number.")],
+    validators: [argvParser.validators.integer("Custom message. ${1} must be a number.")],
 
     // Transforms allow you to get more intelligent values
     // than raw strings back
@@ -136,7 +136,7 @@ undefined, or an array of errors and/or validation messages, and an
 
 ```js
 var args = require("samplx-argv-parser").create();
-args.handle(process.argv.slice(2), function (errors, options) {
+args.parse(process.argv.slice(2), function (errors, options) {
     if (errors) {
         // Print an error msg, i.e. console.log(errors[0])
         // may also generate a standard usage message
