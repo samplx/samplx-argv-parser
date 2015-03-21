@@ -24,6 +24,13 @@ buster.testCase("validators", {
                 validators: [validator]
             });
         };
+        this.multipleValidatedOption = function (validator) {
+            this.a.createOption(["-m"], {
+                hasValue: true,
+                allowMultiple: true,
+                validators: [validator]
+            });
+        };
         this.validatedOperand = function (validator) {
             this.a.createOperand("rest", { validators: [validator] });
         };
@@ -99,6 +106,7 @@ buster.testCase("validators", {
     "integer": {
         setUp: function () {
             this.validatedOption(v.integer());
+            this.multipleValidatedOption(v.integer());
         },
 
         "test passing integer": function (done) {
@@ -107,6 +115,12 @@ buster.testCase("validators", {
             }));
         },
 
+        "test without option": function (done) {
+            this.a.parse([], done(function (errors) {
+                refute(errors);
+            }));
+        },
+        
         "test passing string": function (done) {
             this.a.parse(["-pabc"], done(function (errors) {
                 assert.equals(errors.length, 1);
@@ -129,7 +143,12 @@ buster.testCase("validators", {
                 assert.match(errors[0], "123.4");
                 assert.match(errors[0], /not an integer/);
             }));
-        }
+        },
+        "test passing multiple integers": function (done) {
+            this.a.parse(["-m1", "-m2"], done(function (errors) {
+                refute(errors);
+            }));
+        },
     },
 
     "number": {
@@ -432,99 +451,118 @@ buster.testCase("validators", {
     },
 
     "positiveInteger": {
+        setUp: function() {
+            this.validatedOption(v.positiveInteger());
+            this.multipleValidatedOption(v.positiveInteger());
+        },
+        
         "test Infinity value": function (done) {
-            this.a.createOption(["-v"], { hasValue: true, validators: [v.positiveInteger()] });
-            
-            this.a.parse(["-v", "Infinity"], done(function (errors, options) {
-                assert.equals(options["-v"].value, "Infinity");
+            this.a.parse(["-p", "Infinity"], done(function (errors, options) {
+                refute(errors);
+                assert.equals(options["-p"].value, "Infinity");
             }));
         },
         
         "test negative integer": function (done) {
-            this.a.createOption(["-v"], { hasValue: true, validators: [v.positiveInteger()] });
-            
-            this.a.parse(["-v=-12"], done(function (errors, options) {
+            this.a.parse(["-p=-12"], done(function (errors, options) {
+                assert(errors);
                 assert.match(errors[0], /is not a positive integer/);
             }));
         },
         
         "test positive integer": function (done) {
-            this.a.createOption(["-v"], { hasValue: true, validators: [v.positiveInteger()] });
-            
-            this.a.parse(["-v", "12"], done(function (errors, options) {
-                assert.equals(options["-v"].value, "12");
+            this.a.parse(["-p", "12"], done(function (errors, options) {
+                refute(errors);
+                assert.equals(options["-p"].value, "12");
             }));
         },
-        
+
+        "test zero": function (done) {
+            this.a.parse(["-p", "0"], done(function (errors, options) {
+                assert(errors);
+                assert.match(errors[0], /is not a positive integer/);
+            }));
+        },
+                
         "test floating number": function (done) {
-            this.a.createOption(["-v"], { hasValue: true, validators: [v.positiveInteger()] });
-            
-            this.a.parse(["-v", "3.14"], done(function (errors, options) {
+            this.a.parse(["-p", "3.14"], done(function (errors, options) {
+                assert(errors);
                 assert.match(errors[0], /is not a positive integer/);
             }));
         },
 
         "test non-number": function (done) {
-            this.a.createOption(["-v"], { hasValue: true, validators: [v.positiveInteger()] });
-            
-            this.a.parse(["-v", "twelve"], done(function (errors, options) {
+            this.a.parse(["-p", "twelve"], done(function (errors, options) {
+                assert(errors);
+                assert.match(errors[0], /is not a positive integer/);
+            }));
+        },
+        
+        "test multiple positive integers": function (done) {
+            this.a.parse(["-m", "1", "-m", "2"], done(function (errors, options) {
+                refute(errors);
+                assert(Array.isArray(options["-m"].value));
+                assert(options["-m"].value.length == 2);
+            }));
+        },
+        
+        "test one positive, one negative integer": function (done) {
+            this.a.parse(["-m", "1", "-m=-1"], done(function (errors, options) {
+                assert(errors);
+                assert.match(errors[0], /is not a positive integer/);
+            }));
+        },
+        
+        "test multiple non-numbers": function (done) {
+            this.a.parse(["-m=two", "-m=one"], done(function (errors, options) {
+                assert(errors);
                 assert.match(errors[0], /is not a positive integer/);
             }));
         },
     },
     
     "isURL": {
-        "http URL" : function (done) {
+        setUp: function() {
             this.a.createOption(["--url"], { hasValue: true, validators: [v.isURL()] });
-            
+        },
+                    
+        "http URL" : function (done) {
             this.a.parse(["--url", "http://example.com"], done(function (errors, options) {
                 assert.equals(options["--url"].value, "http://example.com");
             }));
         },
         
         "scheme authority path URL" : function(done) {
-            this.a.createOption(["--url"], { hasValue: true, validators: [v.isURL()] });
-            
             this.a.parse(["--url", "http://example.com/myfile"], done(function (errors, options) {
                 assert.equals(options["--url"].value, "http://example.com/myfile");
             }));
         },
         
         "scheme authority path query URL" : function (done) {
-            this.a.createOption(["--url"], { hasValue: true, validators: [v.isURL()] });
-            
             this.a.parse(["--url", "http://example.com/index.php?what=now"], done(function (errors, options) {
                 assert.equals(options["--url"].value, "http://example.com/index.php?what=now");
             }));
         },
         
         "scheme authority path query fragment URL" : function (done) {
-            this.a.createOption(["--url"], { hasValue: true, validators: [v.isURL()] });
-            
             this.a.parse(["--url", "http://example.com/index.php?what=now#there"], done(function (errors, options) {
                 assert.equals(options["--url"].value, "http://example.com/index.php?what=now#there");
             }));
         },
         
         "scheme authority no-path query URL" : function (done) {
-            this.a.createOption(["--url"], { hasValue: true, validators: [v.isURL()] });
-            
             this.a.parse(["--url", "http://example.com/?what=now"], done(function (errors, options) {
                 assert.equals(options["--url"].value, "http://example.com/?what=now");
             }));
         },
         
         "scheme authority no-path no-query fragement URL": function (done) {
-            this.a.createOption(["--url"], { hasValue: true, validators: [v.isURL()] });
-            
             this.a.parse(["--url", "http://example.com#there"], done(function (errors, options) {
                 assert.equals(options["--url"].value, "http://example.com#there");
             }));
         },
         
         "no scheme invalid URL": function (done) {
-            this.a.createOption(["--url"], { hasValue: true, validators: [v.isURL()] });
-            
             this.a.parse(["--url", "example.com"], done(function (errors, options) {
                 assert.equals(options["--url"].value, "example.com");
             }));
@@ -535,6 +573,7 @@ buster.testCase("validators", {
         "test integer": function (done) {
             this.validatedOption(v.integer("I love ${2}!"));
             this.a.parse(["-p", "not a number"], done(function (errors) {
+                assert(errors);
                 assert.equals(errors[0], "I love not a number!");
             }));
         },
@@ -542,6 +581,7 @@ buster.testCase("validators", {
         "test integer with signature": function (done) {
             this.validatedOption(v.integer("Yay ${2} and ${1}!"));
             this.a.parse(["-p", "not a number"], done(function (errors) {
+                assert(errors);
                 assert.equals(errors[0], "Yay not a number and -p!");
             }));
         },
@@ -549,6 +589,7 @@ buster.testCase("validators", {
         "test number": function (done) {
             this.validatedOption(v.number("I love ${2}!"));
             this.a.parse(["-p", "not a number"], done(function (errors) {
+                assert(errors);
                 assert.equals(errors[0], "I love not a number!");
             }));
         },
@@ -559,6 +600,7 @@ buster.testCase("validators", {
                 validators: [v.number("I love ${2} and ${1}!")]
             });
             this.a.parse(["-p", "not a number"], done(function (errors) {
+                assert(errors);
                 assert.equals(errors[0], "I love not a number and -p!");
             }));
         },
@@ -581,6 +623,7 @@ buster.testCase("validators", {
                 validators: [v.file("Foo ${2}")]
             });
             this.a.parse(["-p", "/dev/null"], done(function (errors) {
+                assert(errors);
                 assert.equals(errors[0], "Foo /dev/null");
             }));
         },
@@ -592,6 +635,7 @@ buster.testCase("validators", {
                 validators: [v.file("Foo ${2}")]
             });
             this.a.parse(["-p", "/some/dir"], done(function (errors) {
+                assert(errors);
                 assert.equals(errors[0], "Foo /some/dir");
             }));
         },
@@ -600,6 +644,7 @@ buster.testCase("validators", {
             this.stubFsStat({ isFile: false, isDirectory: false });
             this.validatedOption(v.directory("Foo ${2}"));
             this.a.parse(["-p", "/dev/null"], done(function (errors) {
+                assert(errors);
                 assert.equals(errors[0], "Foo /dev/null");
             }));
         },
@@ -608,6 +653,7 @@ buster.testCase("validators", {
             this.stubFsStat({ isFile: true });
             this.validatedOption(v.directory("Foo ${2}"));
             this.a.parse(["-p", "/some/file"], done(function (errors) {
+                assert(errors);
                 assert.equals(errors[0], "Foo /some/file");
             }));
         },
@@ -616,6 +662,7 @@ buster.testCase("validators", {
             this.stubFsStat({ isFile: false, isDirectory: false });
             this.validatedOption(v.fileOrDirectory("Foo ${2}"));
             this.a.parse(["-p", "/dev/null"], done(function (errors) {
+                assert(errors);
                 assert.equals(errors[0], "Foo /dev/null");
             }));
         },
@@ -628,6 +675,7 @@ buster.testCase("validators", {
 
             this.validatedOption(v.fileOrDirectory("Foo ${2}"));
             this.a.parse(["-p", "/dev/null"], done(function (errors) {
+                assert(errors);
                 assert.equals(errors[0], "Foo /dev/null");
             }));
         }
