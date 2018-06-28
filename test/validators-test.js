@@ -1,13 +1,15 @@
 /*jslint maxlen: 100 */
-var buster = require("buster");
-var assert = buster.assert;
-var refute = buster.refute;
-var args = require("./../lib/samplx-argv-parser");
-var path = require("path");
-var net = require("net");
-var fs = require("fs");
-var when = require("when");
-var v = args.validators;
+"use strict";
+
+const buster = require("buster");
+const assert = buster.assert;
+const refute = buster.refute;
+const args = require("./../lib/samplx-argv-parser");
+const path = require("path");
+const net = require("net");
+const fs = require("fs");
+const when = require("when");
+const v = args.validators;
 
 buster.testCase("validators", {
     setUp: function () {
@@ -37,7 +39,7 @@ buster.testCase("validators", {
     },
 
     "basic validator with error": function (done) {
-        var actualError = "An error message";
+        const actualError = "An error message";
         this.a.createOption(["-p"], {
             validators: [function (opt) { return when.reject(actualError); }]
         });
@@ -120,7 +122,7 @@ buster.testCase("validators", {
                 refute(errors);
             }));
         },
-        
+
         "test passing string": function (done) {
             this.a.parse(["-pabc"], done(function (errors) {
                 assert.equals(errors.length, 1);
@@ -157,7 +159,7 @@ buster.testCase("validators", {
         },
 
         "passes for integer": function (done) {
-            var self = this;
+            const self = this;
             this.a.parse(["-p123"], done(function (errors) {
                 refute(errors);
             }));
@@ -441,7 +443,7 @@ buster.testCase("validators", {
 
         "fails with custom error": function (done) {
             this.a.createOption(["-v"], {
-                allowMultiple: true, 
+                allowMultiple: true,
                 validators: [v.maxTimesSet(2, "${1} iz ${2}!")]
             });
             this.a.parse(["-v", "-v", "-v"], done(function (errors, options) {
@@ -455,21 +457,21 @@ buster.testCase("validators", {
             this.validatedOption(v.positiveInteger());
             this.multipleValidatedOption(v.positiveInteger());
         },
-        
+
         "test Infinity value": function (done) {
             this.a.parse(["-p", "Infinity"], done(function (errors, options) {
                 refute(errors);
                 assert.equals(options["-p"].value, "Infinity");
             }));
         },
-        
+
         "test negative integer": function (done) {
             this.a.parse(["-p=-12"], done(function (errors, options) {
                 assert(errors);
                 assert.match(errors[0], /is not a positive integer/);
             }));
         },
-        
+
         "test positive integer": function (done) {
             this.a.parse(["-p", "12"], done(function (errors, options) {
                 refute(errors);
@@ -483,7 +485,7 @@ buster.testCase("validators", {
                 assert.match(errors[0], /is not a positive integer/);
             }));
         },
-                
+
         "test floating number": function (done) {
             this.a.parse(["-p", "3.14"], done(function (errors, options) {
                 assert(errors);
@@ -497,7 +499,7 @@ buster.testCase("validators", {
                 assert.match(errors[0], /is not a positive integer/);
             }));
         },
-        
+
         "test multiple positive integers": function (done) {
             this.a.parse(["-m", "1", "-m", "2"], done(function (errors, options) {
                 refute(errors);
@@ -505,14 +507,14 @@ buster.testCase("validators", {
                 assert(options["-m"].value.length == 2);
             }));
         },
-        
+
         "test one positive, one negative integer": function (done) {
             this.a.parse(["-m", "1", "-m=-1"], done(function (errors, options) {
                 assert(errors);
                 assert.match(errors[0], /is not a positive integer/);
             }));
         },
-        
+
         "test multiple non-numbers": function (done) {
             this.a.parse(["-m=two", "-m=one"], done(function (errors, options) {
                 assert(errors);
@@ -520,55 +522,55 @@ buster.testCase("validators", {
             }));
         },
     },
-    
+
     "isURL": {
         setUp: function() {
             this.a.createOption(["--url"], { hasValue: true, validators: [v.isURL()] });
         },
-                    
+
         "http URL" : function (done) {
             this.a.parse(["--url", "http://example.com"], done(function (errors, options) {
                 assert.equals(options["--url"].value, "http://example.com");
             }));
         },
-        
+
         "scheme authority path URL" : function(done) {
             this.a.parse(["--url", "http://example.com/myfile"], done(function (errors, options) {
                 assert.equals(options["--url"].value, "http://example.com/myfile");
             }));
         },
-        
+
         "scheme authority path query URL" : function (done) {
             this.a.parse(["--url", "http://example.com/index.php?what=now"], done(function (errors, options) {
                 assert.equals(options["--url"].value, "http://example.com/index.php?what=now");
             }));
         },
-        
+
         "scheme authority path query fragment URL" : function (done) {
             this.a.parse(["--url", "http://example.com/index.php?what=now#there"], done(function (errors, options) {
                 assert.equals(options["--url"].value, "http://example.com/index.php?what=now#there");
             }));
         },
-        
+
         "scheme authority no-path query URL" : function (done) {
             this.a.parse(["--url", "http://example.com/?what=now"], done(function (errors, options) {
                 assert.equals(options["--url"].value, "http://example.com/?what=now");
             }));
         },
-        
+
         "scheme authority no-path no-query fragement URL": function (done) {
             this.a.parse(["--url", "http://example.com#there"], done(function (errors, options) {
                 assert.equals(options["--url"].value, "http://example.com#there");
             }));
         },
-        
+
         "no scheme invalid URL": function (done) {
             this.a.parse(["--url", "example.com"], done(function (errors, options) {
                 assert.equals(options["--url"].value, "example.com");
             }));
         },
     },
-    
+
     "custom error messages": {
         "test integer": function (done) {
             this.validatedOption(v.integer("I love ${2}!"));

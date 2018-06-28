@@ -1,9 +1,9 @@
 /*jslint maxlen: 100*/
-var buster = require("buster");
-var assert = buster.assert;
-var refute = buster.refute;
-var args = require("./../lib/samplx-argv-parser");
-var when = require("when");
+const buster = require("buster");
+const assert = buster.assert;
+const refute = buster.refute;
+const args = require("./../lib/samplx-argv-parser");
+const when = require("when");
 
 buster.testCase("Operands", {
     setUp: function () {

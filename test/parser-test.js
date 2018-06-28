@@ -1,8 +1,10 @@
-var buster = require("buster");
-var assert = buster.assert;
-var refute = buster.refute;
-var args = require("./../lib/samplx-argv-parser");
-var p = require("../lib/parser");
+"use strict";
+
+const buster = require("buster");
+const assert = buster.assert;
+const refute = buster.refute;
+const args = require("./../lib/samplx-argv-parser");
+const p = require("../lib/parser");
 
 buster.testCase("parser", {
     setUp: function () {
@@ -17,14 +19,14 @@ buster.testCase("parser", {
         },
 
         "returns arguments untouched when no shorthands": function () {
-            var args = p.expandShorthands(["-h", "-p", "1337"], this.a.options);
+            const args = p.expandShorthands(["-h", "-p", "1337"], this.a.options);
 
             assert.equals(args, ["-h", "-p", "1337"]);
         },
 
         "expands shorthand": function () {
             this.a.addShorthand("-P", ["-p", "80"]);
-            var args = p.expandShorthands(["-h", "-P"], this.a.options);
+            const args = p.expandShorthands(["-h", "-P"], this.a.options);
 
             assert.equals(args, ["-h", "-p", "80"]);
         },
@@ -32,7 +34,7 @@ buster.testCase("parser", {
         "expands all shorthands": function () {
             this.a.addShorthand("-P", ["-p", "80"]);
             this.a.addShorthand("-H", ["--help"]);
-            var args = p.expandShorthands(["-H", "-P"], this.a.options);
+            const args = p.expandShorthands(["-H", "-P"], this.a.options);
 
             assert.equals(args, ["--help", "-p", "80"]);
         }

@@ -1,9 +1,9 @@
 /*jslint maxlen: 100 */
-var buster = require("buster");
-var assert = buster.assert;
-var refute = buster.refute;
-var args = require("./../lib/samplx-argv-parser");
-var when = require("when");
+const buster = require("buster");
+const assert = buster.assert;
+const refute = buster.refute;
+const args = require("./../lib/samplx-argv-parser");
+const when = require("when");
 
 buster.testCase("Short options", {
     setUp: function () {
@@ -318,22 +318,22 @@ buster.testCase("Short options", {
 
     "test option with argument set multiple times": function (done) {
         this.a.createOption(["-p"], { allowMultiple: true, hasValue: true });
-        
+
         this.a.parse(["-p12", "-p34"], done(function (errors, options) {
             assert.equals(options["-p"].value.length, 2);
             assert.equals(options["-p"].value[0], "12");
             assert.equals(options["-p"].value[1], "34");
         }));
     },
-    
+
     "test options with allowOverride set multiple times": function (done) {
         this.a.createOption(["-p"], { allowOverride: true, hasValue: true });
-        
+
         this.a.parse(["-p12", "-p34"], done(function (errors, options) {
             assert.equals(options["-p"].value, "34");
         }));
     },
-    
+
 });
 
 buster.testCase("Long options", {

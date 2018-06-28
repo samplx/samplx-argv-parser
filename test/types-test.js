@@ -1,8 +1,10 @@
-var buster = require("buster");
-var assert = buster.assert;
-var refute = buster.refute;
-var args = require("../lib/samplx-argv-parser");
-var t = args.types;
+"use strict";
+
+const buster = require("buster");
+const assert = buster.assert;
+const refute = buster.refute;
+const args = require("../lib/samplx-argv-parser");
+const t = args.types;
 
 buster.testCase("types", {
     setUp: function () {

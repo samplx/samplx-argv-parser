@@ -1,8 +1,8 @@
 {
     "name": "samplx-argv-parser",
-    "version": "2.1.0",
+    "version": "2.1.1",
     "description": "command-line argument parser (fork of busterjs/posix-argv-parser).",
-    "homepage": "http://samplx.org/samplx-argv-parser",
+    "homepage": "http://github.com/samplx/samplx-argv-parser",
     "author": {
         "name": "August Lilleaas"
     },
@@ -32,15 +32,12 @@
         "type": "git",
         "url": "https://github.com/samplx/samplx-argv-parser.git"
     },
-    "license": {
-        "type": "BSD",
-        "url": "https://github.com/samplx/samplx-argv-parser/blob/master/LICENSE"
-    },
+    "license": "BSD-3-Clause",
     "scripts": {
         "test": "node run-tests.js"
     },
     "dependencies": {
-        "when": "~ 3.7.2"
+        "when": "~ 3.7.8"
     },
     "devDependencies": {
         "buster": "~ 0.7.7"
@@ -48,5 +45,8 @@
     "readmeFilename": "Readme.md",
     "bugs": {
         "url": "https://github.com/samplx/samplx-argv-parser/issues"
+    },
+    "engines": {
+        "node": ">= 4"
     }
 }

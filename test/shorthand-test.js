@@ -1,8 +1,10 @@
-var buster = require("buster");
-var assert = buster.assert;
-var refute = buster.refute;
-var args = require("./../lib/samplx-argv-parser");
-var shorthand = require("./../lib/shorthand");
+"use strict";
+
+const buster = require("buster");
+const assert = buster.assert;
+const refute = buster.refute;
+const args = require("./../lib/samplx-argv-parser");
+const shorthand = require("./../lib/shorthand");
 
 buster.testCase("Shorthands", {
     setUp: function () {
@@ -114,33 +116,33 @@ buster.testCase("Shorthands", {
         this.a.createOption(["-t", "--terse"]);
         this.a.createOption(["--width"], { hasValue: true });
         this.a.addShorthand("-1", ["--width", "1"]);
-        
+
         this.a.parse(["-1t"], done(function (errors, options) {
             refute(errors);
             assert(options["-t"].isSet);
             assert.equals(options["--width"].value, "1");
         }));
     },
-    
+
     "test short option followed by shorthand": function (done) {
         this.a.createOption(["-t", "--terse"]);
         this.a.createOption(["--width"], { hasValue: true });
         this.a.addShorthand("-1", ["--width", "1"]);
-        
+
         this.a.parse(["-t1"], done(function (errors, options) {
             refute(errors);
             assert(options["-t"].isSet);
             assert.equals(options["--width"].value, "1");
         }));
     },
-    
+
     "test two shorthands followed by short option": function (done) {
         this.a.createOption(["-t", "--terse"]);
         this.a.createOption(["--width"], { hasValue: true });
         this.a.createOption(["--depth"], { hasValue: true });
         this.a.addShorthand("-1", ["--width", "1"]);
         this.a.addShorthand("-2", ["--depth", "2"]);
-        
+
         this.a.parse(["-12t"], done(function (errors, options) {
             refute(errors);
             assert(options["-t"].isSet);
@@ -148,45 +150,54 @@ buster.testCase("Shorthands", {
             assert.equals(options["--depth"].value, "2");
         }));
     },
-    
+
     "expand": {
         "returns args untouched if shorthand is not present": function () {
-            var sh = shorthand.create("-x", ["--zuul", "dana"]);
-            var args = ["-a", "42", "--help"];
+            const sh = shorthand.create("-x", ["--zuul", "dana"]);
+            const args = ["-a", "42", "--help"];
 
             assert.equals(sh.expand(args), args);
         },
 
         "expands shorthand for the last option": function () {
-            var sh = shorthand.create("-x", ["--zuul", "dana"]);
-            var args = ["-a", "42", "-x"];
+            const sh = shorthand.create("-x", ["--zuul", "dana"]);
+            const args = ["-a", "42", "-x"];
 
             assert.equals(sh.expand(args), ["-a", "42", "--zuul", "dana"]);
         },
 
         "expands shorthand for middle option": function () {
-            var sh = shorthand.create("-x", ["--zuul", "dana"]);
-            var args = ["-a", "42", "-x", "--yo", "mister"];
+            const sh = shorthand.create("-x", ["--zuul", "dana"]);
+            const args = ["-a", "42", "-x", "--yo", "mister"];
 
             assert.equals(sh.expand(args),
                           ["-a", "42", "--zuul", "dana", "--yo", "mister"]);
         },
 
         "expands all occurrences of shorthand": function () {
-            var sh = shorthand.create("-x", ["--zuul", "dana"]);
-            var args = ["-x", "-x", "--yo"];
+            const sh = shorthand.create("-x", ["--zuul", "dana"]);
+            const args = ["-x", "-x", "--yo"];
 
             assert.equals(sh.expand(args),
                           ["--zuul", "dana", "--zuul", "dana", "--yo"]);
         },
 
         "does not modify argument": function () {
-            var sh = shorthand.create("-x", ["--zuul", "dana"]);
-            var args = ["-x", "-x", "--yo"];
-            var expanded = sh.expand(args);
+            const sh = shorthand.create("-x", ["--zuul", "dana"]);
+            const args = ["-x", "-x", "--yo"];
+            const expanded = sh.expand(args);
 
             assert.equals(args, ["-x", "-x", "--yo"]);
             refute.equals(args, expanded);
+        },
+
+        "not tries to call pop for string arg with trailing dash": function () {
+            const sh = shorthand.create("-x", ["--zuul", "dana"]);
+            const args = ["should-"];
+
+            refute.exception(function () {
+                sh.expand(args);
+            });
         }
     }
 });

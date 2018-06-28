@@ -219,5 +219,57 @@ buster.testCase("samplx-argv-parser", {
         this.a.parse(["-node"], done(function (errors, options) {
             assert.match(errors[0], "Unknown option '-node'");
         }));
+    },
+
+    "does not use option value as operand": function (done) {
+        this.a.createOption(['--config', '-c'], {hasValue: false});
+        this.a.createOption(['--length', '-l'], {hasValue: true});
+        this.a.createOperand('service');
+
+        this.a.parse(['-cl', '10'], done(function (error, options) {
+            assert.isTrue(options["-c"].isSet);
+            assert.isTrue(options["-l"].isSet);
+            assert.equals(options["-l"].value, "10");
+            assert.isFalse(options.service.isSet);
+        }));
+    },
+
+    "test shorthand first followed by short option": function (done) {
+        this.a.createOption(["-t", "--terse"]);
+        this.a.createOption(["--width"], { hasValue: true });
+        this.a.addShorthand("-1", ["--width", "1"]);
+
+        this.a.parse(["-1t"], done(function (errors, options) {
+            refute(errors);
+            assert(options["-t"].isSet);
+            assert.equals(options["--width"].value, "1");
+        }));
+    },
+
+    "test short option followed by shorthand": function (done) {
+        this.a.createOption(["-t", "--terse"]);
+        this.a.createOption(["--width"], { hasValue: true });
+        this.a.addShorthand("-1", ["--width", "1"]);
+
+        this.a.parse(["-t1"], done(function (errors, options) {
+            refute(errors);
+            assert(options["-t"].isSet);
+            assert.equals(options["--width"].value, "1");
+        }));
+    },
+
+    "test two shorthands followed by short option": function (done) {
+        this.a.createOption(["-t", "--terse"]);
+        this.a.createOption(["--width"], { hasValue: true });
+        this.a.createOption(["--depth"], { hasValue: true });
+        this.a.addShorthand("-1", ["--width", "1"]);
+        this.a.addShorthand("-2", ["--depth", "2"]);
+
+        this.a.parse(["-12t"], done(function (errors, options) {
+            refute(errors);
+            assert(options["-t"].isSet);
+            assert.equals(options["--width"].value, "1");
+            assert.equals(options["--depth"].value, "2");
+        }));
     }
 });
