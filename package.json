@@ -1,6 +1,6 @@
 {
     "name": "samplx-argv-parser",
-    "version": "2.3.0",
+    "version": "2.3.1",
     "description": "command-line argument parser (fork of busterjs/posix-argv-parser).",
     "homepage": "http://github.com/samplx/samplx-argv-parser",
     "author": {
