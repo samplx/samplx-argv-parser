@@ -47,11 +47,11 @@
         "jest-cli": "^23.2.0",
         "jshint": "^2.9.5"
     },
-    "readmeFilename": "Readme.md",
+    "readmeFilename": "README.md",
     "bugs": {
         "url": "https://github.com/samplx/samplx-argv-parser/issues"
     },
     "engines": {
-        "node": ">= 4"
+        "node": ">= 6"
     }
 }
