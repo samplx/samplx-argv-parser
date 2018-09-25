@@ -76,24 +76,6 @@ describe("Shorthands", function () {
         a.parse(["-p"], callback);
     });
 
-    test("test duplicate shorthand", function () {
-        function addDashP() {
-            a.addShorthand("-p", [ "--port" ]);
-        }
-
-        addDashP();
-        expect(addDashP).toThrow();
-    });
-
-    test("test shorthand for option that already exists", function () {
-        function addDashP() {
-            a.addShorthand("-p", [ "--port" ]);
-        }
-
-        a.createOption(["-p"]);
-        expect(addDashP).toThrow();
-    });
-
     describe("shorthand that isn't a valid flag", function () {
         const argv = [ "--port" ];
         test("cake is not a valid flag", function () {

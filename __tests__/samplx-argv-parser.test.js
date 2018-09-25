@@ -111,7 +111,7 @@ describe("samplx-argv-parser", () => {
     test("same options specified in different option", () => {
         a.createOption(["-p"]);
         expect(checkCreateOption(["-p"])).toThrow();
-        
+
         a.createOption(["--port"]);
         expect(checkCreateOption(["--port"])).toThrow();
     });
