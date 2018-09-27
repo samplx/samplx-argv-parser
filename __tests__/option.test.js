@@ -748,6 +748,21 @@ describe("Long options", function () {
         a.createOption(["-p"]);
         a.parse(["-pz"], callback);
     });
+
+    test('shorthand does not expand to right of =', done => {
+        const callback = (errors, options) => {
+            expect(errors).toBeNull();
+            expect(options['--ip']).toBeDefined();
+            expect(Array.isArray(options['--ip'].value)).toBeTruthy();
+            const v = options['--ip'].value[0];
+            expect(v).toBe('127.0.0.1');
+            done();
+        };
+        a.createOption(['--time-slot'], { hasValue: true});
+        a.addShorthand('-1', ['--time-slot', 'Infinity']);
+        a.createOption(['--ip'], { allowMultiple: true, hasValue: true });
+        a.parse(['--ip=127.0.0.1'], callback);
+    });
 });
 
 //     "test multiple operands": function (done) {
