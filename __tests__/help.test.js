@@ -108,6 +108,15 @@ describe("help", () => {
             expect(result.indexOf("--hide")).toBe(-1);
         });
 
+        test("handles a defined operand", () => {
+            a.createOperand("filename", {
+                description : "Optional list of files to scan.",
+                greedy : true
+            });
+            const result = help.formatter(a);
+            expect(result.indexOf("-p")).toBeGreaterThan(-1);
+        });
+
         test("includes default value if defined", () => {
             a.createOption(["--url"], {
                 hasValue: true,
@@ -181,5 +190,5 @@ describe("help", () => {
             expect(mockConsole.error.mock.calls[1][0]).toEqual(helpText);
         });
     });
-    
+
 });
