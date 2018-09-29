@@ -125,6 +125,14 @@ describe("help", () => {
             const result = help.formatter(a);
             expect(result.indexOf("[http://example.com/]")).toBeGreaterThan(-1);
         });
+
+        test('includes - when describing a shorthand', () => {
+            a.addShorthand('-1', ['--greedy', 'one']);
+            a.addShorthand('--two', ['--greedy', 'two']);
+            const result = help.formatter(a);
+            expect(result.indexOf('-1')).toBeGreaterThan(-1);
+            expect(result.indexOf('--two')).toBeGreaterThan(-1);
+        });
     });
 
     describe("printHelp", () => {
