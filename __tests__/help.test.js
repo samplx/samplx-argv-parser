@@ -162,6 +162,15 @@ describe("help", () => {
             expect(help.printErrors).toBeDefined();
             expect(typeof help.printErrors).toBe("function");
         });
+        test('output is formatted', () => {
+            const errors = [ new Error('bad value') ];
+            help.printErrors(errors, a);
+            expect(mockConsole.error.mock.calls.length).toBe(1);
+            expect(mockConsole.error.mock.calls[0].length).toBe(1);
+            const msg = mockConsole.error.mock.calls[0][0];
+            expect(msg.indexOf('ERROR')).toBeGreaterThan(-1);
+            expect(msg.indexOf('bad value')).toBeGreaterThan(-1);
+        });
     });
 
     describe("getUsage", () => {
