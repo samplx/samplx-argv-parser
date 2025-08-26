@@ -1,5 +1,16 @@
 # samplx-argv-parser
 
+**NOTICE**: This package is no longer maintained.
+
+The only program I had that was using this package has been changed to use
+[commander](https://github.com/tj/commander.js) instead.
+I recommend using _commander_, or another package for parsing the command line.
+
+If you plan on continuing using this package, you may want to consider forking it,
+since I plan no further development.
+
+# Summary
+
 `samplx-argv-parser` is a command line interface (CLI) argument parser that is:
 
 * [POSIX "Utility Argument Syntax"](http://pubs.opengroup.org/onlinepubs/9699919799/) compliant
@@ -12,13 +23,13 @@ var argvParser = require("samplx-argv-parser");
 var parserOptions = {
     // program name -- defaults to process.title
     prog : 'sample-program',
-    
+
     // string used to describe the program in help message.
     description : 'A sample program',
-    
+
     // string printed after the help message.
     epilog : 'See more at http://samplx.org/sample-program/'
-    
+
 };
 
 var args = argvParser.create(parserOptions);
@@ -36,10 +47,10 @@ args.createOption(["-p", "--port"], {
     // Transforms allow you to get more intelligent values
     // than raw strings back
     transform: function (value) { return parseInt(value, 10); },
-    
+
     // how this option is described in a help message.
     description: 'define my port number.',
-    
+
     // how this option's parameter is described in the help message.
     valueName: 'PORT'
 });
@@ -63,7 +74,7 @@ args.createOperand("rootPath", {
 });
 
 args.parse(process.argv.slice(2), function (errors, options) {
-    if (errors) { 
+    if (errors) {
         args.printUsage(errors);
     }
 
