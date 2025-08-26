@@ -1,6 +1,6 @@
 {
     "name": "samplx-argv-parser",
-    "version": "2.3.6",
+    "version": "2.3.7",
     "description": "command-line argument parser (fork of busterjs/posix-argv-parser).",
     "homepage": "http://github.com/samplx/samplx-argv-parser",
     "author": {
@@ -40,11 +40,11 @@
         "when": "~ 3.7.8"
     },
     "devDependencies": {
-        "gulp": "^4.0.0",
+        "gulp": "^5.0.0",
         "gulp-jest": "^4.0.2",
         "gulp-jshint": "^2.1.0",
-        "jest": "^23.2.0",
-        "jest-cli": "^23.2.0",
+        "jest": "^29.7.0",
+        "jest-cli": "^29.7.0",
         "jshint": "^2.9.5"
     },
     "readmeFilename": "README.md",
@@ -52,6 +52,6 @@
         "url": "https://github.com/samplx/samplx-argv-parser/issues"
     },
     "engines": {
-        "node": ">= 6"
+        "node": ">= 20"
     }
 }
