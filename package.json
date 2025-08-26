@@ -30,7 +30,7 @@
     "main": "./lib/samplx-argv-parser",
     "repository": {
         "type": "git",
-        "url": "https://github.com/samplx/samplx-argv-parser.git"
+        "url": "git+https://github.com/samplx/samplx-argv-parser.git"
     },
     "license": "BSD-3-Clause",
     "scripts": {
